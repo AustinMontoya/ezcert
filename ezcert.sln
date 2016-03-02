@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ezcert", "ezcert\ezcert.csproj", "{918702BE-E839-4ED6-8812-2F8BDD09BBB2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ezcert.util", "ezcert.util\ezcert.util.csproj", "{5F1640D3-537C-4759-957F-5E00B3871997}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{918702BE-E839-4ED6-8812-2F8BDD09BBB2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{918702BE-E839-4ED6-8812-2F8BDD09BBB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{918702BE-E839-4ED6-8812-2F8BDD09BBB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{918702BE-E839-4ED6-8812-2F8BDD09BBB2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F1640D3-537C-4759-957F-5E00B3871997}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F1640D3-537C-4759-957F-5E00B3871997}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F1640D3-537C-4759-957F-5E00B3871997}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F1640D3-537C-4759-957F-5E00B3871997}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
