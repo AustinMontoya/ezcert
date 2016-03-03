@@ -11,8 +11,7 @@ namespace ezcert.util
     {
       if (string.IsNullOrEmpty(path))
       {
-        path = FindApplicationHostConfig(Environment.CurrentDirectory);
-        if (path == null) throw new InvalidOperationException("No applicationhost.config found in a .vs or documents folder");
+        throw new ArgumentException("Path is required");
       }
       
       var doc = XDocument.Load(path);
@@ -21,19 +20,31 @@ namespace ezcert.util
       doc.Save(path);
     }
 
- 
-    private static string FindApplicationHostConfig(string path)
+
+    public static void InjectSecurityConfigSection(string path)
     {
-      if (path == Path.GetPathRoot(path))
+      if (string.IsNullOrEmpty(path))
       {
-        var globalConfigPath = Path.Combine(path, "Users", Environment.UserName, "Documents", "IISExpress", "config", "applicationhost.config");
-        return File.Exists(globalConfigPath) ? globalConfigPath : null;
+        throw new ArgumentException("Path is required");
       }
 
-      var localConfigPath = Path.Combine(path, ".vs", "config", "applicationhost.config");
-      return File.Exists(localConfigPath)
-        ? localConfigPath
-        : FindApplicationHostConfig(Directory.GetParent(path).FullName);
+      var doc = XDocument.Load(path);
+      var webServerElement = doc.XPathSelectElement("//system.webServer");
+      var securityElement = SelectOrCreateElement(webServerElement, "//security", "security");
+      var accessElement = SelectOrCreateElement(securityElement, "access", "access");
+
+      accessElement.SetAttributeValue(XName.Get("sslFlags"), "Ssl,SslRequireCert,SslNegotiateCert");
+      doc.Save(path);
+    }
+
+    private static XElement SelectOrCreateElement(XContainer parent, string xpath, string name)
+    {
+      var element = parent.XPathSelectElement(xpath);
+      if (element != null) return element;
+
+      element = new XElement(XName.Get(name));
+      parent.AddFirst(element);
+      return element;
     }
   }
 }
