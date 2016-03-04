@@ -6,9 +6,7 @@
         [string]$CaPath,
         [string]$CaPassword,
         [bool]$UseDefaultCa = $true,
-        [bool]$AutoImport = $true,
-        [bool]$UnlockConfigSections = $false,
-        [switch]$MergeConfig = $false
+        [bool]$AutoImport = $true
     )
     $clientCert = $null
 
