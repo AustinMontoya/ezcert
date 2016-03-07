@@ -1,10 +1,7 @@
-﻿Add-Type -Path "ezcert.util.dll"
-
-function Inject-ClientCertificateConfiguration {
+﻿function Initialize-ClientCertConfig {
     Param(
         [string]$Path = $null
     )
-
 
     if (!$Path) {
         $Path = Get-ConfigPath -path (Get-Item -Path $PWD) -targetPath "web.config"
@@ -12,7 +9,7 @@ function Inject-ClientCertificateConfiguration {
     }
 
     Write-Host "Adding <security> section to $Path"
-    [ezcert.util.EnvironmentUtils]::InjectSecurityConfigSection($Path)
+    & $ezcertExecutablePath InjectSecurityConfigSection -configPath="$Path"
     Write-Host "Configuration updated"
 }
 

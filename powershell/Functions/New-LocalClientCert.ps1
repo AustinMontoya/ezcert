@@ -1,4 +1,4 @@
-﻿function Create-LocalClientCertificate {
+﻿function New-LocalClientCert {
     Param(
         [string]$Name = "clientCertificate",
         [string]$Password = "password",
@@ -21,18 +21,15 @@
 
         if (!$defaultCaExists) {
             Write-Host "Default CA not detected"
-            Create-LocalCA
-        }   
+            New-LocalCA
+        }
     } 
 
-    $caCert = [ezcert.util.CertUtils]::LoadCertificate((Get-Item -Path $CaPath -Verbose).FullName, $CaPassword)
+    $fullCaPath = (Get-Item -Path $CaPath -Verbose).FullName
+    $outputPath = [System.IO.Path]::Combine($currentDirectoryPath, $OutputFileName) 
 
     Write-Host "Creating client certificate"
-    $clientCert = [ezcert.util.CertUtils]::IssueCertificate($Name, $caCert)
-
-    $currentDirectoryPath = (Get-Item -Path ".\" -Verbose).FullName
-    $outputPath = [System.IO.Path]::Combine($currentDirectoryPath, $OutputFileName) 
-    [ezcert.util.CertUtils]::WriteCertificate($clientCert, $Password, $outputPath)
+    & $ezcertExecutablePath CreateClientCert -name="$Name" -password="$Password" -caPath="$fullCaPath" -caPassword="$CaPassword" -outputPath="$outputPath"
 
     if (!$AutoImport) {
         return

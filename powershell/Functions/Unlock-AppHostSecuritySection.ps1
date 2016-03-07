@@ -1,6 +1,4 @@
-﻿Add-Type -Path 'ezcert.util.dll'
-
-function Unlock-AppHostSecuritySection {
+﻿function Unlock-AppHostSecuritySection {
     Param(
         [string]$Path
     )
@@ -11,7 +9,7 @@ function Unlock-AppHostSecuritySection {
     }
 
     Write-Host "Modifying $Path"
-    [ezcert.util.EnvironmentUtils]::UnlockConfigSection($Path)
+    & $ezcertExecutablePath UnlockConfigSection -configPath="$Path"
     Write-Host "Config section unlocked"
 }
 
@@ -27,17 +25,4 @@ function Get-AppHostConfigPath {
     } 
           
     throw "No applicationhost.config found in .vs/config anywhere in this directory or its parents, or in ~/Documents/IISExpress/config"    
-}
-
-function Get-ConfigPath($path, $targetPath) {
-    if ($path.ToString() -eq [IO.Path]::GetPathRoot($path)) {
-        return $null
-    }
-
-    $localConfigPath = [IO.Path]::Combine($path, $targetPath)
-    if (Test-Path $localConfigPath) {
-        return $localConfigPath
-    }
-
-    return Get-ConfigPath -path (Get-Item $path).Parent.FullName -targetPath $targetPath
 }

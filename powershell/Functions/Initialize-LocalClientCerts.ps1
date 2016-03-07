@@ -1,12 +1,12 @@
-﻿function Setup-LocalClientCerts {
+﻿function Initialize-LocalClientCerts {
     Param(
         [switch]$Auto = $false
     )
 
     if ($Auto) {
         Write-Host "Creating client cert using default settings."
-        Create-LocalCA
-        Create-LocalClientCertificate
+        New-LocalCA
+        New-LocalClientCertificate
         Unlock-AppHostSecuritySection
         return
     }
@@ -46,7 +46,7 @@ I can also import the CA into your Local Machine certificate store.
         }
 
         $outputPath = ".\localCA.pfx"
-        Create-LocalCA -OutputFileName $outputPath -AutoImport $autoImport
+        New-LocalCA -OutputFileName $outputPath -AutoImport $autoImport
         $useDefaultCa = $true
     }
 
@@ -74,7 +74,7 @@ While not required, this allows you to easily verify your setup via a browser.
 
     Write-Host "Pfx output file location [./$clientCertName.pfx]: "
     $clientCertOutputLocation = Read-Input -defaultValue "$(Get-Item -Path $PWD)\$clientCertName.pfx"
-    Create-LocalClientCertificate -Name $clientCertName -UseDefaultCa $useDefaultCa -CaPath $caPath -CaPassword $caPassword -OutputFileName $clientCertOutputLocation -AutoImport $autoImportClientCert
+    New-LocalClientCert -Name $clientCertName -UseDefaultCa $useDefaultCa -CaPath $caPath -CaPassword $caPassword -OutputFileName $clientCertOutputLocation -AutoImport $autoImportClientCert
 
     Write-Host @"
     
@@ -100,7 +100,7 @@ Configure project? [y/N]:
 
     $configureProject = (Read-Input -defaultValue "n") -eq "y"
     if($configureProject) {
-        Inject-ClientCertificateConfiguration
+        Initialize-ClientCertificateConfiguration
     }
 
     Write-Host @"
@@ -138,13 +138,4 @@ Open your web.config and add the following section under <system.webServer>:
 
 "@
     }
-}
-
-function Read-Input ($defaultValue) {
-    $result = (Read-Host).ToLowerInvariant()
-    if ([string]::IsNullOrEmpty($result)) {
-        $result = $defaultValue
-    }
-
-    return $result
 }

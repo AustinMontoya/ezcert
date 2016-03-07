@@ -1,6 +1,4 @@
-﻿Add-Type -Path 'ezcert.util.dll'
-
-function Create-LocalCA {
+﻿function New-LocalCA {
     Param(
         [string]$Name = "localCA",
         [string]$Password = "password",
@@ -17,25 +15,22 @@ function Create-LocalCA {
 
     $currentDirectoryPath = (Get-Item -Path ".\" -Verbose).FullName
     $outputPath = [System.IO.Path]::Combine($currentDirectoryPath, $OutputFileName) 
-    $cert = [ezcert.util.CertUtils]::CreateCertificateAuthorityCertificate($Name, $Password)
-    [ezcert.util.CertUtils]::WriteCertificate($cert, $Password, $outputPath)
+    & $ezcertExecutablePath CreateCaCert -name="$Name" -password="$Password" -outputPath="$outputPath"
 
     Write-Host "CA created at $outputPath"
 
     if (!$AutoImport) {
         return;
     }
-
     
     $cmd = 
 @"
 `$securePassword = ConvertTo-SecureString -String $Password -AsPlainText -Force
 Write-Host "Importing CA into Local Machine Trusted Root store..."
-Import-PfxCertificate -FilePath '$outputPath' -Password `$securePassword -CertStoreLocation "Cert:\LocalMachine\Root" 
+Import-PfxCertificate -FilePath '$outputPath' -Password `$securePassword -CertStoreLocation "Cert:\LocalMachine\Root" -Exportable
+Read-Host
 "@
 
     Start-Process -FilePath powershell.exe -Verb RunAs -ArgumentList ([Scriptblock]::Create($cmd))
-        
-       
 }
 

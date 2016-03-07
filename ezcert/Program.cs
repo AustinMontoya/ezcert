@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using ezcert.util;
@@ -9,101 +11,147 @@ namespace ezcert
 {
   class Program
   {
-    static class Operations
+    enum Subcommand
     {
-      public const string CreateCa = "createca";
-      public const string CreateClientCert = "createclientcert";
-
-      public static string Get(string arg)
-      {
-        switch (arg.ToLower())
-        {
-          case CreateCa:
-            return CreateCa;
-          case CreateClientCert:
-            return CreateClientCert;
-          default:
-            return string.Empty;
-        }
-      }
-    }
-    static void Main(string[] args)
-    {
-      var operation = GetOperation(args.FirstOrDefault());
-      if (string.IsNullOrEmpty(operation))
-      {
-        ShowUsage();
-        return;
-      } 
-
-      DoOperation(operation, args.Skip(1));
+      Unknown,
+      UnlockConfigSection,
+      InjectSecurityConfigSection,
+      CreateClientCert,
+      CreateCaCert
     }
 
-    private static string GetOperation(string firstArg)
-    {
+    static void Main(string[] args) {
+      var sub = GetSubcommand(args.FirstOrDefault());
+      DoSubcommmand(sub, args.Skip(1).ToArray());
+    }
+
+    private static Subcommand GetSubcommand(string firstArg) {
       var operationArg = firstArg;
-      if (string.IsNullOrEmpty(operationArg) || new Regex("^(--?|\\/)").IsMatch(operationArg)) {
+      if (string.IsNullOrEmpty(operationArg)) {
         Console.WriteLine("ERROR: Missing operation");
-        return string.Empty;
+        return Subcommand.Unknown;
       }
 
-      var operation = Operations.Get(operationArg);
-      if (string.IsNullOrEmpty(operation)) {
-        Console.WriteLine($"ERROR: Unrecognized operation {operationArg}");
-        return string.Empty;
-      }
+      Subcommand sub;
+      if (Enum.TryParse(firstArg, true, out sub)) return sub;
 
-      return operation;
+      Console.WriteLine($"ERROR: Unrecognized operation {operationArg}");
+      return Subcommand.Unknown;
     }
 
-    private static void DoOperation(string operation, IEnumerable<string> args)
-    {
-      var certName = string.Empty;
-      var caPath = string.Empty;
-      var caPassword = string.Empty;
-      var outputFile = "out.pfx";
+    private static void DoSubcommmand(Subcommand command, string[] args) {
 
-      var optionSet = new OptionSet()
-      {
-        {"CertName=", v => certName = v},
-        {"CaPath=", v => caPath = v },
-        {"CaPassword=", v => caPassword = v ?? "password" },
-        {"OutputFile=", v => outputFile = v }
-      };
-
-      optionSet.Parse(args);
-
-      if (string.IsNullOrEmpty(certName))
-      {
-        Console.WriteLine("ERROR: -CertName is required");
-        ShowUsage();
-        return;
-      }
-
-      if (operation == Operations.CreateCa)
-      {
-        if (string.IsNullOrEmpty(caPath))
-        {
-          Console.WriteLine("ERROR: -CaPath is required");
-        }
-        var cert = CertUtils.CreateCertificateAuthorityCertificate(certName, caPassword);
-        CertUtils.WriteCertificate(cert, caPassword, outputFile);
-      }
-
-      if (operation == Operations.CreateClientCert)
-      {
-        var caCert = CertUtils.LoadCertificate(caPath, caPassword);
-        var cert = CertUtils.IssueCertificate(certName, caCert);
-        CertUtils.WriteCertificate(cert, null, outputFile);
+      switch (command) {
+        case Subcommand.CreateCaCert:
+          CreateCaCert(args);
+          break;
+        case Subcommand.CreateClientCert:
+          CreateClientCert(args);
+          break;
+        case Subcommand.UnlockConfigSection:
+          UnlockConfigSection(args);
+          break;
+        case Subcommand.InjectSecurityConfigSection:
+          InjectConfigSection(args);
+          break;
+        default:
+          ShowUsage();
+          break;
       }
     }
 
-    private static void ShowUsage()
+    private static void InjectConfigSection(string[] args)
     {
+      string configPath = null;
+      new OptionSet
+      {
+        {"configPath=", v => configPath = v}
+      }.Parse(args);
+
+      if (string.IsNullOrEmpty(configPath)) {
+        throw new ArgumentException("configPath is required");
+      }
+
+      EnvironmentUtils.InjectSecurityConfigSection(configPath);
+    }
+
+    private static void UnlockConfigSection(string[] args)
+    {
+      string configPath = null;
+      new OptionSet
+      {
+        {"configPath=", v => configPath = v}
+      }.Parse(args);
+
+
+      if (string.IsNullOrEmpty(configPath))
+      {
+        throw new ArgumentException("configPath is required");
+      }
+
+      EnvironmentUtils.UnlockConfigSection(configPath);
+    }
+
+
+    private static void CreateClientCert(string[] args)
+    {
+      string name = null;
+      string password = "password";
+      string caPath = null;
+      string caPassword = "password";
+      string outputPath = Path.Combine(Environment.CurrentDirectory, $"{name}.pfx");
+
+      new OptionSet
+      {
+        {"name=", (v) => name = v},
+        {"password=", (v) => password = v},
+        {"caPath=", (v) => caPath = v},
+        {"caPassword=", (v) => caPassword = v},
+        {"outputPath=", (v) => outputPath = v}
+      }.Parse(args);
+
+      if (string.IsNullOrEmpty(name))
+      {
+        throw new ArgumentException("Name is required");
+      }
+
+      if (string.IsNullOrEmpty(caPath))
+      {
+        throw new ArgumentException("caPath is required");
+      }
+
+      var caCert = CertUtils.LoadCertificate(caPath, caPassword);
+      var clientCert = CertUtils.IssueCertificate(name, caCert);
+      CertUtils.WriteCertificate(clientCert, password, outputPath);
+    }
+
+   
+
+    private static void CreateCaCert(string[] args) {
+      string name = null;
+      string password = "password";
+      string outputPath = Path.Combine(Environment.CurrentDirectory, $"{name}.pfx"); 
+
+      new OptionSet
+      {
+        {"name=", (v) => name = v},
+        {"password=", (v) => password = v},
+        {"outputPath=", (v) => outputPath = v}
+      }.Parse(args);
+
+      if (string.IsNullOrEmpty(name)) {
+        throw new ArgumentException("Name is required");
+      }
+
+      var cert = CertUtils.CreateCertificateAuthorityCertificate(name, password);
+      CertUtils.WriteCertificate(cert, password, outputPath);
+    }
+
+    private static void ShowUsage() {
       Console.Write("Usage: ezcert <operation> [options...]");
     }
 
   }
 
-  
+
 }
