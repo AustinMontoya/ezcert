@@ -2,7 +2,7 @@
     Param(
         [string]$Name = "localCA",
         [string]$Password = "password",
-        [string]$OutputFileName = "localCA.pfx",
+        [string]$OutputPath = $null,
         [bool]$AutoImport = $true
     );
 
@@ -13,11 +13,13 @@
         }
     }
 
-    $currentDirectoryPath = (Get-Item -Path ".\" -Verbose).FullName
-    $outputPath = [System.IO.Path]::Combine($currentDirectoryPath, $OutputFileName) 
-    & $ezcertExecutablePath CreateCaCert -name="$Name" -password="$Password" -outputPath="$outputPath"
+    if (!$OutputPath) {
+        $OutputPath = [System.IO.Path]::Combine($PWD, "$Name.pfx") 
+    }
 
-    Write-Host "CA created at $outputPath"
+    & $ezcertExecutablePath CreateCaCert -name="$Name" -password="$Password" -outputPath="$OutputPath"
+
+    Write-Host "CA created at $OutputPath"
 
     if (!$AutoImport) {
         return;
@@ -27,8 +29,7 @@
 @"
 `$securePassword = ConvertTo-SecureString -String $Password -AsPlainText -Force
 Write-Host "Importing CA into Local Machine Trusted Root store..."
-Import-PfxCertificate -FilePath '$outputPath' -Password `$securePassword -CertStoreLocation "Cert:\LocalMachine\Root" -Exportable
-Read-Host
+Import-PfxCertificate -FilePath '$OutputPath' -Password `$securePassword -CertStoreLocation "Cert:\LocalMachine\Root" -Exportable
 "@
 
     Start-Process -FilePath powershell.exe -Verb RunAs -ArgumentList ([Scriptblock]::Create($cmd))
