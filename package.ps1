@@ -13,8 +13,12 @@ if (Test-Path $outputFolder) {
 }
 
 mkdir $outputFolder
-cp "$PWD\ezcert\bin\Release\*" $outputFolder
-cp -recurse "$PWD\powershell\*" $outputFolder
+gci "$PWD\ezcert\bin\Release" -exclude "*.vshost.*" | cp -dest $outputFolder
+
+$psSource = (Get-Item .\powershell).FullName
+gci $psSource -r | where { 
+  $_.fullName -notmatch "Tests.ps1" -and ($_.fullName -notmatch "TestData")  
+} | cp -d {Join-Path $outputFolder $_.FullName.Substring($psSource.length)}
 
 $workDir = (Get-Item -Path $PWD).FullName
 $packageDest = "$workDir\package.zip"

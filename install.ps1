@@ -6,7 +6,7 @@ if (Test-Path $outputFile) {
   rm $outputFile
 }
 
-Invoke-WebRequest -Uri "file:///$env:USERPROFILE/Documents/Visual Studio 2015/Projects/ezcert/package.zip" -OutFile $outputFile
+Invoke-WebRequest -Uri "https://github.com/grrizzly/ezcert/releases/download/0.0.1/package.zip" -OutFile $outputFile
 
 if (Test-Path $installLocation) {
   Write-Host "Removing previously installed version"
