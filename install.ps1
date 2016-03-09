@@ -6,6 +6,7 @@ if (Test-Path $outputFile) {
   rm $outputFile
 }
 
+Write-Host "Downloading package"
 Invoke-WebRequest -Uri "https://github.com/grrizzly/ezcert/releases/download/0.0.1/package.zip" -OutFile $outputFile
 
 if (Test-Path $installLocation) {
@@ -15,3 +16,4 @@ if (Test-Path $installLocation) {
 
 Add-Type -A 'System.IO.Compression.FileSystem'
 [IO.Compression.ZipFile]::ExtractToDirectory($outputFile, $installLocation)
+Write-Host "ezcert installed"
