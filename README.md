@@ -19,7 +19,7 @@ What it doesn't do:
 Quick way:
 
 ```powershell
-(new-object Net.WebClient).DownloadString("https://github.com/grrizzly/ezcert/master/install.ps1") | iex
+(new-object Net.WebClient).DownloadString("https://raw.githubusercontent.com/grrizzly/ezcert/master/install.ps1") | iex
 ```
 
 (You are encouraged to look at the installation script before running it!)
