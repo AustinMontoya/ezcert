@@ -71,7 +71,7 @@ namespace ezcert.util
       var serialNumber = GenerateSerialNumber(random);
       var issuerSerialNumber = serialNumber; // Self-signed, so it's the same serial number.
       
-      var certificate = GenerateCertificate(random, name, subjectKeyPair, serialNumber, issuerName, issuerKeyPair);
+      var certificate = GenerateCertificate(random, name, subjectKeyPair, serialNumber, GetCommonName(issuerName), issuerKeyPair);
       return ConvertCertificate(certificate, subjectKeyPair, random);
     }
 
