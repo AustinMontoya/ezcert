@@ -119,7 +119,7 @@ namespace ezcert.util
       const string signatureAlgorithm = "SHA256WithRSA";
       certificateGenerator.SetSignatureAlgorithm(signatureAlgorithm);
 
-      var issuerDN = new X509Name(GetCommonName(issuerName));
+      var issuerDN = new X509Name(issuerName);
       certificateGenerator.SetIssuerDN(issuerDN);
 
       // Note: The subject can be omitted if you specify a subject alternative name (SAN).
