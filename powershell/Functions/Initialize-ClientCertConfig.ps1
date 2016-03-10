@@ -8,8 +8,8 @@
         if (!$Path) { throw "Couldn't find a web.config to modify. Are you in the right directory?" }
     }
 
-    Write-Host "Adding <security> section to $Path"
+    Write-Log "Adding <security> section to $Path"
     & $ezcertExecutablePath InjectSecurityConfigSection -configPath="$Path"
-    Write-Host "Configuration updated"
+    Write-Success "Configuration updated"
 }
 

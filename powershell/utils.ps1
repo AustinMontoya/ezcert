@@ -19,3 +19,11 @@ function Read-Input ($defaultValue) {
 
     return $result
 }
+
+@(
+    @("Info", "cyan"),
+    @("Success", "green"),
+    @("Log", "gray")
+) | foreach-object { 
+    iex "function Write-$($_[0])(`$message) { Write-Host `$message -ForegroundColor $($_[1]) }" 
+}

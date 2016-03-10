@@ -4,13 +4,13 @@
     )
 
     if (!$Path) {
-        Write-Host "Searching for applicationhost.config..."
+        Write-Log "Searching for applicationhost.config..."
         $Path = Get-AppHostConfigPath
     }
 
-    Write-Host "Modifying $Path"
+    Write-Log "Modifying $Path"
     & $ezcertExecutablePath UnlockConfigSection -configPath="$Path"
-    Write-Host "Config section unlocked"
+    Write-Success "Config section unlocked"
 }
 
 function Get-AppHostConfigPath {
@@ -18,7 +18,7 @@ function Get-AppHostConfigPath {
 
     if ($path) { return $path }
    
-    Write-Host "Local applicationhost.config not found, modifying machine-wide config"
+    Write-Info "Local applicationhost.config not found, modifying machine-wide config"
     $globalConfigPath = [IO.Path]::Combine($env:USERPROFILE, "Documents/IISExpress/config/applicationhost.config")
     if (Test-Path $globalConfigPath) {
         return $globalConfigPath

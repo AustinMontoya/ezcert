@@ -8,7 +8,7 @@
 
     if ($Name -eq "localCA" -and $Password -eq "password") {
         if (gci -Path Cert:\LocalMachine\Root | Where-Object {$_.Subject -eq "CN=localCA"}) {
-            Write-Host "Default Local CA already exists, skipping"
+            Write-Info "Default Local CA already exists, skipping"
             return;
         }
     }
@@ -19,7 +19,7 @@
 
     & $ezcertExecutablePath CreateCaCert -name="$Name" -password="$Password" -outputPath="$OutputPath"
 
-    Write-Host "CA created at $OutputPath"
+    Write-Success "CA created at $OutputPath"
 
     if (!$AutoImport) {
         return;

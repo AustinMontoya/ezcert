@@ -1,3 +1,7 @@
+$infoColor = 'cyan'
+$errorColor = 'red'
+$logColor = 'green'
+
 $moduleRoot = Split-Path -Path $MyInvocation.MyCommand.Path
 $ezCertExecutablePath = "$moduleRoot/ezcert.exe"
 

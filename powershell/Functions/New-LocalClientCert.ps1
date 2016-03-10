@@ -20,7 +20,7 @@
         $CaPassword = "password"
 
         if (!$defaultCaExists) {
-            Write-Host "Default CA not detected"
+            Write-Info "Default CA not detected"
             New-LocalCA
         }
     } 
@@ -28,14 +28,15 @@
     $fullCaPath = (Get-Item -Path $CaPath -Verbose).FullName
     $outputPath = [System.IO.Path]::Combine($currentDirectoryPath, $OutputFileName) 
 
-    Write-Host "Creating client certificate"
+    Write-Log "Creating client certificate"
     & $ezcertExecutablePath CreateClientCert -name="$Name" -password="$Password" -caPath="$fullCaPath" -caPassword="$CaPassword" -outputPath="$outputPath"
-
+    Write-Success "Client certificate created at $path"
     if (!$AutoImport) {
         return
     }
     
-    Write-Host "Importing client certificate into Current User Root store..."
+    Write-Log "Importing client certificate into Current User Personal store..."
     $securePassword = ConvertTo-SecureString -String $Password -AsPlainText -Force
     Import-PfxCertificate -FilePath $outputPath -Password $securePassword -CertStoreLocation "Cert:\CurrentUser\My" 
+    Write-Success "Certificate imported."
 }
