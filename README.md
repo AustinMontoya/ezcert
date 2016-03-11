@@ -1,4 +1,12 @@
-# Overview
+# Table of Contents
+
+- [Overview](#overview)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [Command Reference](#commandRef)
+
+# Overview<a name="overview"></a>
 
 This is a standalone powershell module intended to simplify the local setup of SSL Certificate Authentication in ASP.Net projects.
 
@@ -14,7 +22,7 @@ This is a standalone powershell module intended to simplify the local setup of S
 - Create certificates suitable for production use
 - Set up [Client Certificate Mapping Auth](https://www.iis.net/configreference/system.webserver/security/authentication/iisclientcertificatemappingauthentication)
 
-# Installation
+# Installation<a name="installation"></a>
 
 ## Quick way
 
@@ -31,7 +39,7 @@ This is a standalone powershell module intended to simplify the local setup of S
 1. Unzip the contents into your `~\Documents\WindowsPowerShell\Modules` folder, in a new folder named "ezcert"
 1. Kill your current terminal session and start a new one.
 
-# Usage
+# Usage<a name="usage"></a>
 
 This module adds four single-purpose commands for various setup tasks, and one "quick" command that abstracts the normal flow of commands needed to set up a new project.
 
@@ -83,7 +91,7 @@ Each approach has pros and cons:
 
 Certainly, these are not the only two ways of using this module. For instance, you could use one "artifact" CA across all projects and check client certificates in. One reason to do this might be for doing integration tests around authentication. 
 
-# Contributing
+# Contributing<a name="contributing"></a>
 
 If you have any suggestions for improvement, or are interested in adding new features, open an issue. We will do our best to respond in a timely fashion. We especially appreciate any security tips that ensure a minimum level of security suitable for local development.
 
