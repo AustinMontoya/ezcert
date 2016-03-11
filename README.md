@@ -56,7 +56,7 @@ When using the defaults, this command will skip creation if a certificate with t
 - `-Name [string]`: The [Common Name](https://support.dnsimple.com/articles/what-is-common-name/) to add to the certificate. Defaults to `localCA`. Many guides indicate that this should match a domain, but this isn't a hard requirement. 
 - `-Password [string]`: The password used to protect the private key. Defaults to `password`. 
 - `-OutputPath [string]`: The full path to save the .pfx export in. Defaults to `$PWD\$Name.pfx`
-- `-AutoImport { $true | $false }`: Indicates whether to automatically import the certificate into your Local Machine's Trusted Root Certification Authorities certificate store. Defaults to `$true`. Note that the imported CA can also be exported using the password provided by the `Password` param. Also note that this will attempt to launch an elevated prompt, so make sure your user can elevate to Administrator privileges.
+- `-AutoImport [bool]`: Indicates whether to automatically import the certificate into your Local Machine's Trusted Root Certification Authorities certificate store. Defaults to `$true`. Note that the imported CA can also be exported using the password provided by the `Password` param. Also note that this will attempt to launch an elevated prompt, so make sure your user can elevate to Administrator privileges.
 
 #### `New-LocalClientCert`
 
@@ -64,4 +64,49 @@ Creates and optionally installs a client certificate using a given CA.
 
 If attempting to use the default CA and it does not exist, it will be created.
 
+##### Options:
 
+- `-Name [string]`: The Common Name for the certificate. Defaults to `clientCertificate`.
+- `-Password [string]`: The password used to protect the private key. Defaults to `password`.
+- `-OutputFileName [string]`: The name of the file to save the .pfx export in. Defaults to `clientCertificate.pfx`.
+- `-AutoImport [bool]`:  Indicates whether to automatically import the certificate into your user's Personal certificate store. Defaults to `$true`.
+- `-UseDefaultCa [bool]`: Looks for an existing CA in your Local Machine's trusted store matching the default CA's name (`localCA`). If found, it will use this CA to issue the client certificate.
+- `-CaPath [string]`: The path to a custom CA if not using the default. 
+- `-CaPassword [string]`: The password for the custom CA if not using the default.
+
+#### `Unlock-AppHostSecuritySection`
+
+Updates an `applicationhost.config` file, changing the `<section name="access">` element's `overrideModeDefault` property to `Allow`, enabling applications using this config to specify their own SSL configuration.
+
+##### Options:
+
+- `-Path [string]`: The path to the `applicationhost.config` file. If not provided, this command will, starting in the current directory, look for a file at `.vs\config\applicationhost.config`, traversing upwards until it hits the root path. If no such file exists, this command checks for the global IISExpress configuration, located at `~\Documents\IISExpress\config\applicationhost.config`. When no suitable file is found, it will throw an error.
+
+#### `Initialize-ClientCertConfig`
+
+Updates a `web.config` file, adding in the basic boilerplate to enable client certificate authentication for a particlar project. Specifically, it adds the following subtree to `<system.webServer>`:
+
+```xml
+<security>
+    <access sslFlags="Ssl,SslRequireCert,SslNegotiateCert" />
+</security>
+```
+
+Tips:
+
+- To make client certificate authentication optional, remove the `SslRequireCert` flag from the attribute value.
+- If you would like to only enable client certificate authentication for part of your application, consider moving the element into a separate `<location>` element, e.g.
+
+```xml
+<location path="services">
+  <system.webServer>
+    <security>
+      <access sslFlags="Ssl,SslNegotiateCert,SslRequireCert" />
+    </security>
+  </system.webServer>
+</location>
+```
+
+##### Options:
+
+- `-Path [string]`: The path to the `web.config` file. If not provided, this command will, starting in the current directory, search for a `web.config` file, traversing upward until it reaches the drive root. It will throw an error if no file is found.
