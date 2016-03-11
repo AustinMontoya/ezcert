@@ -30,7 +30,7 @@
 
     Write-Log "Creating client certificate"
     & $ezcertExecutablePath CreateClientCert -name="$Name" -password="$Password" -caPath="$fullCaPath" -caPassword="$CaPassword" -outputPath="$outputPath"
-    Write-Success "Client certificate created at $path"
+    Write-Success "Client certificate created at $outputPath"
     if (!$AutoImport) {
         return
     }

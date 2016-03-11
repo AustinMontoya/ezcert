@@ -101,7 +101,7 @@ It will not modify or delete other elements. Keep in mind though that this will 
 
     $configureProject = (Read-Input -defaultValue "n") -eq "y"
     if($configureProject) {
-        Initialize-ClientCertificateConfiguration
+        Initialize-ClientCertConfig
     }
 
     Write-Success "All Done!"
